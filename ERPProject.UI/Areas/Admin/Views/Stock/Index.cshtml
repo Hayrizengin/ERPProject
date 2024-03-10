@@ -1,0 +1,393 @@
+﻿@using ERPProject.UI.Areas.Admin.Models;
+@model StockVM
+@inject IHttpContextAccessor Accessor
+@{
+    ViewData["Title"] = "Stok";
+    ViewData["baslik"] = "Stoklar";
+    ViewData["buttonismi"] = "Stok Ekle";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var name1 = TempData["stok"] as string;
+}
+<div class="text-danger"><strong>@name1</strong> </div>
+<div class="container-table100" style="border-radius:8px;">
+    <div class="wrap-table100">
+        <div class="table100 ver5 m-b-110">
+            <div class="table100-head">
+                <table>
+                    <thead>
+                        <tr class="row100 head bg-opacity-75">
+                            <th class="cell100 column2 text-light" style="padding-left:5px;">Şirket Adı</th>
+                            <th class="cell100 column2 text-light">Ürün Adı</th>
+                            <th class="cell100 column2 text-light">Ürün Açıklaması</th>
+                            <th class="cell100 column2 text-light">Miktar</th>
+                            <th class="cell100 column5 text-light">İşlemler</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="table100-body">
+                <table id="example">
+                    <div id="notFoundMessage" class="text-danger" style="display: none; padding-top:5px;">Sonuç bulunamadı...</div>
+                    <tbody>
+                        @foreach (var item in Model.Stocks)
+                        {
+                            <tr class="row100 body">
+                                <td class="cell100 column2" style="padding-left:5px;">@item.CompanyName</td>
+                                <td class="cell100 column2">@item.ProductName</td>
+                                <td class="cell100 column2">@item.Description</td>
+                                @if (@item.QuantityUnit == 1)
+                                {
+                                    <td class="cell100 column2"> @item.Quantity Metre</td>
+                                }
+                                else if (@item.QuantityUnit == 2)
+                                {
+                                    <td class="cell100 column2">@item.Quantity Kilometre</td>
+                                }
+                                else if (@item.QuantityUnit == 3)
+                                {
+                                    <td class="cell100 column2">@item.Quantity Mililitre</td>
+                                }
+                                else if (@item.QuantityUnit == 4)
+                                {
+                                    <td class="cell100 column2">@item.Quantity Litre</td>
+                                }
+                                else if (@item.QuantityUnit == 5)
+                                {
+                                    <td class="cell100 column2">@item.Quantity Kilogram</td>
+                                }
+                                else if (@item.QuantityUnit == 6)
+                                {
+                                    <td class="cell100 column2">@item.Quantity Ton</td>
+                                }
+                                else if (@item.QuantityUnit == 7)
+                                {
+                                    <td class="cell100 column2">@item.Quantity Adet</td>
+                                }
+                                else if (@item.QuantityUnit == 8)
+                                {
+                                    <td class="cell100 column2"> @item.Quantity Koli</td>
+                                }
+                                else if (@item.QuantityUnit == 9)
+                                {
+                                    <td class="cell100 column2">@item.Quantity m²</td>
+                                }
+                                else if (@item.QuantityUnit == 10)
+                                {
+                                    <td class="cell100 column2">@item.Quantity m³</td>
+                                }
+                                <td class="cell100 column5">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                            İşlemler
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                            <li>
+                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop1"
+                                                   data-id="@item.Id"
+                                                   data-company="@item.CompanyId"
+                                                   data-product="@item.ProductId"
+                                                   data-description="@item.Description"
+                                                   data-quantity="@item.Quantity"
+                                                   data-quantityunit="@item.QuantityUnit">Stok Düzenle</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
+                                                   data-stokid="@item.Id">Stok Ekle/Çıkar</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticDetay"
+                                                   data-stokid1="@item.Id">Stok Detay</a>
+                                            </li>
+                                            <li><hr class="dropdown-divider text-danger"></li>
+                                            <li><a class="dropdown-item text-danger" onclick="confirmRolDelete(@item.Id)">Sil</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; height: 585px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 295px;"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Stok Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/StokEkle" method="post">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        @if (SessionRole.RoleName.Any(x => x.Contains("Admin")))
+                        {
+                            <select class="form-control" id="inputCompanyId" name="CompanyId" aria-describedby="basic-addon1" required>
+                                <option value="">Şirket Seçiniz..</option>
+                                @foreach (var item in Model.Companies)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <select class="form-control" id="inputCompanyId" name="CompanyId" aria-describedby="basic-addon1" required>
+                                <option value="@Accessor.HttpContext.Session.GetString("Company")">@Accessor.HttpContext.Session.GetString("CompanyName")</option>
+                               
+                            </select>
+                        }
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <select class="form-control" id="inputProductId" name="ProductId" aria-describedby="basic-addon1" required>
+                            <option value="">Ürün Seçiniz...</option>
+                            @foreach (var item in Model.Products)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+
+                        </select>
+                    </div>
+
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <input class="form-control" id="inputQuantity" type="number" placeholder="Miktar..." name="Quantity" aria-describedby="basic-addon1" required>
+                        <select class="form-control" id="inputTalepAd" name="QuantityUnit" aria-describedby="basic-addon1" required>
+                            <option value="">Birim Seçiniz...</option>
+                            <option value="1">Metre</option>
+                            <option value="2">Kilometre</option>
+                            <option value="3">Mililitre</option>
+                            <option value="4">Litre</option>
+                            <option value="5">Kilogram</option>
+                            <option value="6">Ton</option>
+                            <option value="7">Adet</option>
+                            <option value="8">Koli</option>
+                            <option value="9">m²</option>
+                            <option value="10">m³</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <textarea autocomplete="off" style="min-height:150px; max-height:150px;" class="form-control" id="inputDescription" placeholder="Açıklama..." name="Description" aria-describedby="basic-addon1" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static1" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Stok Ürünü Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/StokGuncelle" method="post">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <input id="inputId" hidden="hidden" name="Id" />
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        @if (SessionRole.RoleName.Any(x => x.Contains("Admin")))
+                        {
+                            <select class="form-control" id="inputCompanyId" name="CompanyId" aria-describedby="basic-addon1" required>
+                                <option value="">Şirket Seçiniz..</option>
+                                @foreach (var item in Model.Companies)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <select class="form-control" id="inputCompanyId" name="CompanyId" aria-describedby="basic-addon1" required>
+                                <option value="@Accessor.HttpContext.Session.GetString("Company")">@Accessor.HttpContext.Session.GetString("CompanyName")</option>
+
+                            </select>
+                        }
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <select class="form-control" id="inputProductId1" name="ProductId" aria-describedby="basic-addon1" required>
+                            <option value="">Ürün Seçiniz...</option>
+                            @foreach (var item in Model.Products)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <input class="form-control" id="inputQuantity1" type="number" placeholder="Miktar..." name="Quantity" aria-describedby="basic-addon1" required>
+                        <select class="form-control" id="inputQuantityUnit1" name="QuantityUnit" aria-describedby="basic-addon1" required>
+                            <option value="">Birim Seçiniz...</option>
+                            <option value="1">Metre</option>
+                            <option value="2">Kilometre</option>
+                            <option value="3">Mililitre</option>
+                            <option value="4">Litre</option>
+                            <option value="5">Kilogram</option>
+                            <option value="6">Ton</option>
+                            <option value="7">Adet</option>
+                            <option value="8">Koli</option>
+                            <option value="9">m²</option>
+                            <option value="10">m³</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <textarea autocomplete="off" style="min-height:150px; max-height:150px;" class="form-control" id="inputDescription1" placeholder="Açıklama..." name="Description" aria-describedby="basic-addon1" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static1" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Stok Ekle/Çıkar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/StokDetayEkle" method="post">
+                <div class="modal-body">
+                    <input class="form-control" id="inputStokId" type="hidden" name="StockId" aria-describedby="basic-addon1" required>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <select class="form-control" id="inputTeslimatId" name="DelivererId" aria-describedby="basic-addon1" required>
+
+                            <option value="@Accessor.HttpContext.Session.GetString("User")">@Accessor.HttpContext.Session.GetString("UserName")</option>
+
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <select class="form-control" id="inputAliciId" name="RecieverId" aria-describedby="basic-addon1" required>
+                            <option value="">Teslim Alan Kişiyi Seçiniz...</option>
+                            @foreach (var item in Model.Users)
+                            {
+                                <option value="@item.Id">@item.Name @item.LastName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <input autocomplete="off" type="number" class="form-control" id="inputQuantity" placeholder="Miktar..." name="Quantity" aria-describedby="basic-addon1" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticDetay" data-bs-backdrop="static1" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Stok Detay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="stokidtable" type="hidden">
+                <div id="tabledetail">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var token = $("#token").val();
+    function confirmRolDelete(id) {
+        var result = confirm("Bu stok'u silmek istediğinizden emin misiniz?");
+        if (result) {
+            window.location.href = 'StokSil/' + id;
+        }
+    }
+    $('.js-pscroll').each(function () {
+        var ps = new PerfectScrollbar(this);
+        $(window).on('resize', function () {
+            ps.update();
+        })
+    });
+    $('#staticBackdrop1').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var Id = button.data('id');
+        var Company = button.data('company');
+        var Product = button.data('product');
+        var Description = button.data('description');
+        var Quantity = button.data('quantity');
+        var Quantityunit = button.data('quantityunit');
+        $("#inputId").val(Id);
+        $("#inputCompanyId1").val(Company);
+        $("#inputProductId1").val(Product);
+        $("#inputDescription1").val(Description);
+        $("#inputQuantity1").val(Quantity);
+        $("#inputQuantityUnit1").val(Quantityunit);
+    });
+    $('#staticBackdrop2').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var Id = button.data('stokid');
+        $("#inputStokId").val(Id);
+    });
+    $('#staticDetay').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var Id = button.data('stokid1');
+        $("#stokidtable").val(Id);
+        $.ajax({
+            url: "https://localhost:7075/StockDetailsByStock/" + Id,
+            type: "GET",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            },
+            success: function (data) {
+
+                var html = `<table class="table table-hover table-responsive">` +
+                    `<tr><th>Açıklama</th></tr>`;
+                var arr = data;
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i].quantity < 0) {
+                        html += `<tr><td>`;
+                        html += `${arr[i].productName} ürünü "${arr[i].recieverName}" adlı personele ${Math.abs(arr[i].quantity)} adet verildi. (İşlemi Yapan Personel: ${arr[i].delivererName}) Tarih: (${formatDate(arr[i].addedTime)})`
+                        html += `</td></tr>`;
+                    } else {
+                        html += `<tr><td>`;
+                        html += `${arr[i].productName} ürünü "${arr[i].recieverName}"adlı personelden ${Math.abs(arr[i].quantity)} adet stoğa eklendi. (İşlemi Yapan Personel: ${arr[i].delivererName}) Tarih: (${formatDate(arr[i].addedTime)})`
+                        html += `</td></tr>`;
+                    }
+                }
+                html += `</table>`;
+                $("#tabledetail").html(html);
+            }
+        });
+    });
+    function formatDate(inputDate) {
+        const dateObj = new Date(inputDate);
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const hours = String(dateObj.getHours()).padStart(2, '0');
+        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+        return `${year}/${month}/${day} ${hours}:${minutes}`;
+    }
+</script>
+
+
+

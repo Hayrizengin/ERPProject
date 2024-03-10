@@ -1,0 +1,201 @@
+﻿@using ERPProject.UI.Areas.Admin.Models;
+@model ProductVM
+@{
+    ViewData["Title"] = "Urunler";
+    ViewData["baslik"] = "Ürünler";
+    ViewData["buttonismi"] = "Ürün Ekle";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+    <div class="container-table100"  style="border-radius:15px;">
+        <div class="wrap-table100">
+            <div class="table100 ver5 m-b-110">
+                <div class="table100-head">
+                    <table>
+                        <thead>
+                            <tr class="row100 head bg-opacity-75">
+                                <th class="cell100 column2 text-light">Ürün Adı</th>
+                                <th class="cell100 column2 text-light">Kategori</th>
+                                <th class="cell100 column2 text-light">Marka</th>
+                                <th class="cell100 column2 text-light">Açıklama</th>
+                                <th class="cell100 column5 text-light">İşlemler</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="table100-body">
+                <table id="example">
+                        <div id="notFoundMessage" class="text-danger" style="display: none; padding-top:5px;">Sonuç bulunamadı...</div>
+                        <tbody>
+                            @foreach (var item in Model.Products)
+            {
+                            <tr class="row100 body">
+                                    <td class="cell100 column2">@item.Name</td>
+                                    <td class="cell100 column2">@item.CategoryName</td>
+                                    <td class="cell100 column2">@item.BrandName</td>
+                                @if(item.Description == null)
+                                {
+                                    <td class="cell100 column2"> Açıklama Yok...</td>
+                                }
+                                else{
+
+                                    <td class="cell100 column2">@item.Description</td>
+                                    }
+                                <td class="cell100 column5">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                İşlemler
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop1" data-id="@item.Id" data-name-id="@item.Name" data-kategori="@item.CategoryId" data-marka="@item.BrandId" data-desc="@item.Description">Düzenle</a></li>
+                                                <li><hr class="dropdown-divider text-danger"></li>
+                                                <li><a class="dropdown-item text-danger" onclick="confirmUrunDelete(@item.Id)">Sil</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                            </tr>
+            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Ürün Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/UrunEkle" method="post">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input autocomplete="off" type="text" class="form-control" placeholder="Ürün İsmi..." id="inputUrunAd" name="Name" aria-describedby="basic-addon1" required autofocus>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="inputKategori"><i class="bi bi-tags"></i></label>
+                        </div>
+                        <select class="custom-select col col-md-9" id="inputKategori" name="CategoryId" required>
+                            <option value="" selected>Kategori Seç...</option>
+                            @foreach (var item in Model.Categories)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="inputMarka"><i class="bi bi-bootstrap"></i></label>
+                        </div>
+                        <select class="custom-select col col-md-9" id="inputMarka" name="BrandId" required>
+                            <option value="" selected>Marka Seç...</option>
+                            @foreach (var item in Model.Brands)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-info-circle"></i></span>
+                        <textarea style="min-height:150px; max-height:150px;" type="text" class="form-control" placeholder="Ürün Açıklaması..." id="inputUrunAciklama" name="Description" aria-describedby="basic-addon1"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static1" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Ürün Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/UrunGuncelle" method="post">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <input type="hidden" class="form-control" id="inputKategoriId" name="Id" value="" aria-describedby="basic-addon1" required>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input autocomplete="off" type="text" class="form-control" placeholder="Ürün İsmi..." id="inputKategoriAd" name="Name" aria-describedby="basic-addon1" required autofocus>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="inputKategori"><i class="bi bi-tags"></i></label>
+                        </div>
+                        <select class="custom-select col col-md-9" id="inputKategori1" name="CategoryId" required>
+                            <option selected>Kategori Seç...</option>
+                            @foreach (var item in Model.Categories)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="inputMarka"><i class="bi bi-bootstrap"></i></label>
+                        </div>
+                        <select class="custom-select col col-md-9" id="inputMarka1" name="BrandId" required>
+                            <option selected>Marka Seç...</option>
+                            @foreach (var item in Model.Brands)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-info-circle"></i></span>
+                        <textarea style="min-height:150px; max-height:150px;" type="text" class="form-control" placeholder="Ürün Açıklaması..." id="inputUrunAciklama1" name="Description" aria-describedby="basic-addon1"></textarea>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function confirmUrunDelete(id) {
+        var result = confirm("Bu ürünü silmek istediğinizden emin misiniz?");
+        if (result) {
+            window.location.href = 'UrunSil/' + id;
+        }
+    }
+    $('#staticBackdrop1').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var CompanyId = button.data('id');
+        var urunad = button.data('nameId');
+        var category = button.data('kategori');
+        var brand = button.data('marka');
+        var desc = button.data('desc');
+        $("#inputKategoriId").val(CompanyId);
+        $("#inputKategoriAd").val(urunad);
+        $("#inputKategori1").val(category);
+        $("#inputMarka1").val(brand);
+        $("#inputUrunAciklama1").val(desc);
+    });
+    $('.js-pscroll').each(function () {
+        var ps = new PerfectScrollbar(this);
+        $(window).on('resize', function () {
+            ps.update();
+        })
+    });
+</script>
+
+

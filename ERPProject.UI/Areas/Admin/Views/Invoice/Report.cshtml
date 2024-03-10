@@ -1,0 +1,234 @@
+﻿@using ERPProject.UI.Areas.Admin.Models;
+@model InvoiceVM
+@inject IHttpContextAccessor Accessor
+@{
+    ViewData["Title"] = "Raporlar";
+    ViewData["baslik"] = "Raporlar";
+    ViewData["buttonismi"] = "Rapor Bastır";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@{
+    int totalItemCount = Model.Invoices.Count();
+    decimal totalAmount = 0;
+
+    foreach (var item in Model.Invoices)
+    {
+        totalAmount += item.TotalPrice * item.Rate;
+    }
+    totalAmount = Math.Round(totalAmount, 2);
+}
+
+<div id="dol">
+
+    <div class="form-group">
+        <form action="/Admin/Raporlama" method="post">
+            <div class="justify-content-start d-flex">
+                <input autocomplete="off" placeholder="Tarihi Seçiniz" type="text" name="datefilter" />
+                <button type="submit" class="btn btn-success">Uygula</button>
+
+            </div>
+        </form>
+    </div>
+    <br />
+    <br />
+
+    @if (@Model == null)
+    {
+    }
+    else
+    {
+        <div>
+            @($"Toplam Fatura Adedi:{totalItemCount}")<br>
+            @($"Toplam Fatura Tutarı: {totalAmount} ₺")
+            <br>
+            <br>
+
+        </div>
+
+        <table id="example" class="display nowrap" style="width:100%">
+
+            <thead>
+
+                <tr>
+                    <th>Tarih</th>
+                    <th>Satıcı Firma</th>
+                    <th>Alıcı Firma</th>
+                    <th>Fiyat</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Accessor.HttpContext.Session.GetString("CompanyName") == "Admin")
+                {
+                    @foreach (var item in Model.Invoices)
+                    {
+
+                        <tr>
+                            <td>@item.InvoiceDate.ToShortDateString()</td>
+                            <td>@item.SupplierName</td>
+                            <td>@item.CompanyName</td>
+                            @if (item.PriceStatus == "1")
+                            {
+                                var money = item.TotalPrice * item.Rate;
+                                money = Math.Round(money, 2);
+                                <td>@item.TotalPrice $ (@money ₺)</td>
+                            }
+                            @if (item.PriceStatus == "2")
+                            {
+                                var money = item.TotalPrice * item.Rate;
+                                money = Math.Round(money, 2);
+                                <td>@item.TotalPrice £ (@money ₺)</td>
+                            }
+                            @if (item.PriceStatus == "3")
+                            {
+                                var money = item.TotalPrice * item.Rate;
+                                money = Math.Round(money, 2);
+                                <td>@item.TotalPrice ¥ (@money ₺)</td>
+                            }
+                            @if (item.PriceStatus == "0")
+                            {
+                                <td>@item.TotalPrice ₺</td>
+                            }
+                        </tr>
+
+                    }
+                }
+                else
+                {
+                    @foreach (var item in Model.Invoices)
+                    {
+                        if (@item.CompanyName == Accessor.HttpContext.Session.GetString("CompanyName"))
+                        {
+                            <tr>
+                                <td>@item.InvoiceDate.ToShortDateString()</td>
+                                <td>@item.SupplierName</td>
+                                <td>@item.CompanyName</td>
+                                @if (item.PriceStatus == "1")
+                                {
+                                    var money = item.TotalPrice * item.Rate;
+                                    money = Math.Round(money, 2);
+                                    <td>@item.TotalPrice $ (@money ₺)</td>
+                                }
+                                @if (item.PriceStatus == "2")
+                                {
+                                    var money = item.TotalPrice * item.Rate;
+                                    money = Math.Round(money, 2);
+                                    <td>@item.TotalPrice £ (@money ₺)</td>
+                                }
+                                @if (item.PriceStatus == "3")
+                                {
+                                    var money = item.TotalPrice * item.Rate;
+                                    money = Math.Round(money, 2);
+                                    <td>@item.TotalPrice ¥ (@money ₺)</td>
+                                }
+                                @if (item.PriceStatus == "0")
+                                {
+                                    <td>@item.TotalPrice ₺</td>
+                                }
+                            </tr>
+                        }
+                    }
+                }
+
+                <tr style="background-color:white;">
+                    <td>Toplam Adet---> </td>
+                    <td>@($"{totalItemCount}") </td>
+                    <td>Toplam Fiyat ---> </td>
+                    <td> @($"{totalAmount} ₺")</td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+</div>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Fatura Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="multipart/form-data" action="/Admin/FaturaEkle" method="post">
+                    <input type="file" name="FileUpload" required />
+                    <button type="submit" class="btn btn-outline-success">
+                        Ekle
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script type="text/javascript" src="~/Admin/Files/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="~/Admin/Files/buttons.print.min.js"></script>
+<script type="text/javascript" src="~/Admin/Files/daterangepicker.js"></script>
+
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" />
+<script>
+    $(function () {
+        $('input[name="datefilter"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Vazgeç',
+                monthNames: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+            }
+        });
+
+        $('input[name="datefilter"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+
+            // Seçilen tarih aralığını Controller aksiyonuna gönder
+            var startDate = picker.startDate.toISOString();
+            var endDate = picker.endDate.toISOString();
+            sendDateRangeToController(startDate, endDate);
+        });
+
+        $('input[name="datefilter"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+        function sendDateRangeToController(startDate, endDate) {
+            // $.ajax({
+            //     url: '/Admin/Raporlama',  // Controller adını ve aksiyon adını düzenleyin
+            //     type: 'GET',
+            //     data: { startDate: startDate, endDate: endDate },
+            //     success: function (result) {
+
+            //     },
+            //     error: function (error) {
+            //         console.log(error);
+            //     }
+            // });
+        }
+    });
+
+    $('#staticFaturaEkle').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var id = button.data('id');
+        $("#inputRequestId").val(id);
+    });
+    document.getElementById('SearchBtn').style.display = 'none';
+
+
+    $(document).ready(function () {
+        $('#example').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'excel', 'pdf', 'print'
+            ]
+        });
+    });
+</script>

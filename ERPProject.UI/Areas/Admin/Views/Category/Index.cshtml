@@ -1,0 +1,128 @@
+﻿@using ERPProject.Entity.DTO.CategoryDTO;
+@using ERPProject.Entity.Result;
+@model ApiResponse<List<CategoryDTOResponse>>
+
+@{
+    ViewData["Title"] = "Kategoriler";
+    ViewData["baslik"] = "Kategoriler";
+    ViewData["buttonismi"] = "Kategori Ekle";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="container-table100">
+    <div class="wrap-table80">
+        <div class="table100 ver5 m-b-110">
+            <div class="table100-head">
+                <table>
+                    <thead>
+                        <tr class="row100 head">
+                            <th class="cell100 column2 text-light opacity-75">KATEGORİ</th>
+                            <th class="cell100 column5 text-light opacity-75">İŞLEMLER</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="table100-body">
+                <table id="example">
+                    <div id="notFoundMessage" class="text-danger" style="display: none; padding-top:5px;">Sonuç bulunamadı...</div>
+                    <tbody>
+                        @foreach (var item in Model.Data)
+                        {
+                            <tr class="row100 body">
+                                <td class="cell100 column2">@item.Name</td>
+                                <td class="cell100 column5">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                            İşlemler
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop1" data-id="@item.Id" data-name="@item.Name">Kategori Düzenle</a></li>
+                                            <li><hr class="dropdown-divider text-danger"></li>
+                                            <li><a class="dropdown-item text-danger" onclick="confirmRolDelete(@item.Id)">Sil</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="ps__rail-y" style="top: 0px; height: 350px; right: 0px;">
+                    <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 350px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Kategori Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/KategoriEkle" method="post">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Kategori İsmi</span>
+                        <input autocomplete="off" type="text" class="form-control" placeholder="Kategori İsmi..." id="inputRolAd" name="Name" aria-describedby="basic-addon1" required autofocus>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static1" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Kategori Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/KategoriGuncelle" method="post">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <input type="hidden" class="form-control" id="inputKategoriId" name="Id" value="" aria-describedby="basic-addon1">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Kategori İsmi</span>
+                        <input autocomplete="off" type="text" class="form-control" placeholder="Yetki İsmi..." id="inputKategoriAd" name="Name" aria-describedby="basic-addon1" required autofocus>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function confirmRolDelete(id) {
+        var result = confirm("Bu kategoriyi silmek istediğinizden emin misiniz?");
+        if (result) {
+            window.location.href = 'KategoriSil/' + id;
+        }
+    }
+    $('#staticBackdrop1').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var CompanyId = button.data('id');
+        var KategoriAd = button.data('name');
+        $("#inputKategoriId").val(CompanyId);
+        $("#inputKategoriAd").val(KategoriAd);
+
+    });
+    $('.js-pscroll').each(function () {
+        var ps = new PerfectScrollbar(this);
+        $(window).on('resize', function () {
+            ps.update();
+        })
+    });
+</script>
+

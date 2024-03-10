@@ -1,0 +1,432 @@
+﻿@using ERPProject.UI.Areas.Admin.Models;
+@model InvoiceVM
+@inject IHttpContextAccessor Accessor
+@{
+    ViewData["Title"] = "Faturalar";
+    ViewData["baslik"] = "Faturalar";
+    ViewData["buttonismi"] = "Fatura Ekle";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Fatura Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="multipart/form-data" action="/Admin/FaturaEkle" method="post">
+                    <input type="file" name="FileUpload" required />
+                    <button type="submit" class="btn btn-outline-success">
+                        Ekle
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="accordion accordion-flush" id="accordionFlushExample">
+    @if (@Model == null)
+    {
+    }
+    else if (Accessor.HttpContext.Session.GetString("CompanyName") == "Admin")
+    {
+        @foreach (var item in Model.Invoices)
+
+        {
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-heading-@item.Id">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-@item.Id" aria-expanded="false" aria-controls="flush-collapse-@item.Id">
+                        @if (item.PriceStatus == "1")
+                        {
+                            var money = item.TotalPrice * item.Rate;
+                            money = Math.Round(money, 2);
+                            <span><b>@item.CompanyName</b> isimli şirketimize <b>@item.SupplierName</b> firmasından <b>@item.InvoiceDate.ToShortDateString() </b> tarihinde  <b>@item.TotalPrice $ (@money ₺) </b> <b></b>tutarındaki alış faturası. </span>
+                        }
+                        @if (item.PriceStatus == "2")
+                        {
+                            var money = item.TotalPrice * item.Rate;
+                            money = Math.Round(money, 2);
+
+                            <span><b>@item.CompanyName</b> isimli şirketimize <b>@item.SupplierName</b> firmasından <b>@item.InvoiceDate.ToShortDateString() </b> tarihinde  <b>@item.TotalPrice £ (@money ₺)</b> <b></b>tutarındaki alış faturası. </span>
+
+                        }
+                        @if (item.PriceStatus == "3")
+                        {
+                            var money = item.TotalPrice * item.Rate;
+                            money = Math.Round(money, 2);
+
+                            <span><b>@item.CompanyName</b> isimli şirketimize <b>@item.SupplierName</b> firmasından <b>@item.InvoiceDate.ToShortDateString() </b> tarihinde  <b>@item.TotalPrice ¥ (@money ₺)</b> <b></b>tutarındaki alış faturası. </span>
+
+                        }
+                        @if (item.PriceStatus == "0")
+                        {
+                            <span><b>@item.CompanyName</b> isimli şirketimize <b>@item.SupplierName</b> firmasından <b>@item.InvoiceDate.ToShortDateString() </b> tarihinde  <b>@item.TotalPrice ₺ </b> <b></b>tutarındaki alış faturası. </span>
+
+                        }
+
+                        @*
+                <span style="margin-right:250px;">@item.SupplierName</span>
+
+                <span style="margin-right:260px;">@item.CompanyName</span>
+
+                <span> @item.TotalPrice</span>
+                *@
+                        @* Satıcı: <span style="margin-right:150px;">@item.SupplierName</span>   Şirket: <span style="margin-right:150px;">@item.CompanyName</span>  Fiyat: <span style="margin-right:150px;"> @item.TotalPrice</span> *@
+
+
+
+
+                    </button>
+                </h2>
+                <div id="flush-collapse-@item.Id" class="accordion-collapse collapse" aria-labelledby="flush-heading-@item.Id" data-bs-parent="#accordionFlushExample">
+                    <div class="accordion-body">
+                        <div id="example_filter" class="dataTables_filter">
+                            <div id="notFoundMessage" class="text-danger" style="display: none;">Sonuç bulunamadı...</div>
+                        </div>
+                        <table id="example" class="table table-bordered border-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Ürün Adı</th>
+                                    <th scope="col">Miktar</th>
+                                    <th scope="col">Fiyat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var a in Model.InvoiceDetail)
+                                {
+                                    @if (a.InvoiceId == item.Id)
+                                    {
+                                        <tr>
+                                            <td>@a.ProductName</td>
+                                            @if (@a.QuantityUnit == "1")
+                                            {
+                                                <td>
+                                                    @a.Quantity Metre
+                                                </td>
+                                            }
+                                            else if (@a.QuantityUnit == "2")
+                                            {
+                                                <td>
+                                                    @a.Quantity Kilometre
+                                                </td>
+                                            }
+                                            else if (@a.QuantityUnit == "3")
+                                            {
+                                                <td>
+                                                    @a.Quantity Mililitre
+                                                </td>
+                                            }
+                                            else if (@a.QuantityUnit == "4")
+                                            {
+                                                <td>
+                                                    @a.Quantity Litre
+                                                </td>
+                                            }
+                                            else if (@a.QuantityUnit == "5")
+                                            {
+                                                <td>
+                                                    @a.Quantity Kilogram
+                                                </td>
+                                            }
+                                            else if (@a.QuantityUnit == "6")
+                                            {
+                                                <td>
+                                                    @a.Quantity Ton
+                                                </td>
+                                            }
+                                            else if (@a.QuantityUnit == "7")
+                                            {
+                                                <td>
+                                                    @a.Quantity Adet
+                                                </td>
+                                            }
+                                            else if (@a.QuantityUnit == "8")
+                                            {
+                                                <td>
+                                                    @a.Quantity Koli
+                                                </td>
+                                            }
+                                            else if (@a.QuantityUnit == "9")
+                                            {
+                                                <td>
+                                                    @a.Quantity m²
+                                                </td>
+                                            }
+                                            else if (@a.QuantityUnit == "10")
+                                            {
+                                                <td>
+                                                    @a.Quantity m³
+                                                </td>
+                                            }
+                                            @if (item.PriceStatus == "1")
+                                            {
+                                                var money = a.Price * item.Rate;
+                                                money = Math.Round(money, 2);
+                                                <td>@a.Price $ (@money ₺)</td>
+
+                                            }
+                                            @if (item.PriceStatus == "2")
+                                            {
+                                                var money = a.Price * item.Rate;
+                                                money = Math.Round(money, 2);
+                                                <td>@a.Price £ (@money ₺)</td>
+
+
+                                            }
+                                            @if (item.PriceStatus == "3")
+                                            {
+                                                var money = a.Price * item.Rate;
+                                                money = Math.Round(money, 2);
+                                                <td>@a.Price ¥ (@money ₺)</td>
+
+
+                                            }
+                                            @if (item.PriceStatus == "0")
+                                            {
+                                                <td>@a.Price ₺</td>
+
+
+                                            }
+
+                                        </tr>
+                                    }
+
+                                }
+
+
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+
+        @foreach (var item in Model.Invoices)
+
+        {
+            if (@item.CompanyName == Accessor.HttpContext.Session.GetString("CompanyName"))
+            {
+
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-heading-@item.Id">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-@item.Id" aria-expanded="false" aria-controls="flush-collapse-@item.Id">
+                            @if (item.PriceStatus == "1")
+                            {
+                                var money = item.TotalPrice * item.Rate;
+                                money = Math.Round(money, 2);
+                                <span><b>@item.CompanyName</b> isimli şirketimize <b>@item.SupplierName</b> firmasından <b>@item.InvoiceDate.ToShortDateString() </b> tarihinde  <b>@item.TotalPrice $ (@money ₺) </b> <b></b>tutarındaki alış faturası. </span>
+                            }
+                            @if (item.PriceStatus == "2")
+                            {
+                                var money = item.TotalPrice * item.Rate;
+                                money = Math.Round(money, 2);
+
+                                <span><b>@item.CompanyName</b> isimli şirketimize <b>@item.SupplierName</b> firmasından <b>@item.InvoiceDate.ToShortDateString() </b> tarihinde  <b>@item.TotalPrice £ (@money ₺)</b> <b></b>tutarındaki alış faturası. </span>
+
+                            }
+                            @if (item.PriceStatus == "3")
+                            {
+                                var money = item.TotalPrice * item.Rate;
+                                money = Math.Round(money, 2);
+
+                                <span><b>@item.CompanyName</b> isimli şirketimize <b>@item.SupplierName</b> firmasından <b>@item.InvoiceDate.ToShortDateString() </b> tarihinde  <b>@item.TotalPrice ¥ (@money ₺)</b> <b></b>tutarındaki alış faturası. </span>
+
+                            }
+                            @if (item.PriceStatus == "0")
+                            {
+                                <span><b>@item.CompanyName</b> isimli şirketimize <b>@item.SupplierName</b> firmasından <b>@item.InvoiceDate.ToShortDateString() </b> tarihinde  <b>@item.TotalPrice ₺ </b> <b></b>tutarındaki alış faturası. </span>
+
+                            }
+
+                            @*
+                <span style="margin-right:250px;">@item.SupplierName</span>
+
+                <span style="margin-right:260px;">@item.CompanyName</span>
+
+                <span> @item.TotalPrice</span>
+                *@
+                            @* Satıcı: <span style="margin-right:150px;">@item.SupplierName</span>   Şirket: <span style="margin-right:150px;">@item.CompanyName</span>  Fiyat: <span style="margin-right:150px;"> @item.TotalPrice</span> *@
+
+
+
+
+                        </button>
+                    </h2>
+                    <div id="flush-collapse-@item.Id" class="accordion-collapse collapse" aria-labelledby="flush-heading-@item.Id" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <div id="example_filter" class="dataTables_filter">
+                                <div id="notFoundMessage" class="text-danger" style="display: none;">Sonuç bulunamadı...</div>
+                            </div>
+                            <table id="example" class="table table-bordered border-dark">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Ürün Adı</th>
+                                        <th scope="col">Miktar</th>
+                                        <th scope="col">Fiyat</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @foreach (var a in Model.InvoiceDetail)
+                                    {
+                                        @if (a.InvoiceId == item.Id)
+                                        {
+                                            <tr>
+                                                <td>@a.ProductName</td>
+                                                @if (@a.QuantityUnit == "1")
+                                                {
+                                                    <td>
+                                                        @a.Quantity Metre
+                                                    </td>
+                                                }
+                                                else if (@a.QuantityUnit == "2")
+                                                {
+                                                    <td>
+                                                        @a.Quantity Kilometre
+                                                    </td>
+                                                }
+                                                else if (@a.QuantityUnit == "3")
+                                                {
+                                                    <td>
+                                                        @a.Quantity Mililitre
+                                                    </td>
+                                                }
+                                                else if (@a.QuantityUnit == "4")
+                                                {
+                                                    <td>
+                                                        @a.Quantity Litre
+                                                    </td>
+                                                }
+                                                else if (@a.QuantityUnit == "5")
+                                                {
+                                                    <td>
+                                                        @a.Quantity Kilogram
+                                                    </td>
+                                                }
+                                                else if (@a.QuantityUnit == "6")
+                                                {
+                                                    <td>
+                                                        @a.Quantity Ton
+                                                    </td>
+                                                }
+                                                else if (@a.QuantityUnit == "7")
+                                                {
+                                                    <td>
+                                                        @a.Quantity Adet
+                                                    </td>
+                                                }
+                                                else if (@a.QuantityUnit == "8")
+                                                {
+                                                    <td>
+                                                        @a.Quantity Koli
+                                                    </td>
+                                                }
+                                                else if (@a.QuantityUnit == "9")
+                                                {
+                                                    <td>
+                                                        @a.Quantity m²
+                                                    </td>
+                                                }
+                                                else if (@a.QuantityUnit == "10")
+                                                {
+                                                    <td>
+                                                        @a.Quantity m³
+                                                    </td>
+                                                }
+                                                @if (item.PriceStatus == "1")
+                                                {
+                                                    var money = a.Price * item.Rate;
+                                                    money = Math.Round(money, 2);
+                                                    <td>@a.Price $ (@money ₺)</td>
+
+                                                }
+                                                @if (item.PriceStatus == "2")
+                                                {
+                                                    var money = a.Price * item.Rate;
+                                                    money = Math.Round(money, 2);
+                                                    <td>@a.Price £ (@money ₺)</td>
+
+
+                                                }
+                                                @if (item.PriceStatus == "3")
+                                                {
+                                                    var money = a.Price * item.Rate;
+                                                    money = Math.Round(money, 2);
+                                                    <td>@a.Price ¥ (@money ₺)</td>
+
+
+                                                }
+                                                @if (item.PriceStatus == "0")
+                                                {
+                                                    <td>@a.Price ₺</td>
+
+
+                                                }
+
+                                            </tr>
+                                        }
+
+                                    }
+
+
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+        }
+
+
+
+    }
+
+
+</div>
+<script>
+
+
+    $('#staticFaturaEkle').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var id = button.data('id');
+        $("#inputRequestId").val(id);
+    });
+    $(document).ready(function () {
+        $("#inputCompany").change(function () {
+            var selectedCompanyId = $(this).val();
+            $.ajax({
+                url: "https://localhost:7075/GetDepartmentsByCompany/" + selectedCompanyId,
+                type: "GET",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                },
+                success: function (data) {
+                    // Departman seçeneklerini güncelle
+                    $("#inputDepartman").empty();
+                    $.each(data, function (index, item) {
+                        $("#inputDepartman").append("<option value='" + item.id + "'>" + item.name + "</option>");
+                    });
+                }
+            });
+        });
+    }
+</script>

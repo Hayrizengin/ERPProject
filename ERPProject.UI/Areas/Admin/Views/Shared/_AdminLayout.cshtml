@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+@inject IHttpContextAccessor Accessor
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - ERP Project</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/site.css?v=sddPGMKhbj9Qy_U3vejzGfNaVHnfi1187WI71TelVvo">
+    <link rel="stylesheet" type="text/css" href="~/Admin/Files/perfect-scrollbar.css">
+    <link rel="stylesheet" type="text/css" href="~/Admin/Files/util.css">
+    <link rel="stylesheet" type="text/css" href="~/Admin/Files/main.css">
+    <script src="~/Admin/Files/perfect-scrollbar.min.js"></script>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+    <header>
+        <input id="token" hidden="hidden" value="@Accessor.HttpContext.Session.GetString("Token")">
+        <nav class="navbar navbar-expand-sm fixed-top navbar-toggleable-sm" style="background-color:#0f6bae;" id="navBar">
+            <div class="container-fluid">
+                <button class="btn text-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                    <i class="bi bi-list fs-3 text-light" id="listbutton" style="display:none;" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+                    <strong style="font-size:xx-large;" id="logo"><img src="~/admin/img/logos.png" width="100" height="50"/></strong>
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex position-absolute top-50 start-50 translate-middle text-white">
+                    <strong style="font-size:large">@ViewData["baslik"]</strong>
+                </div>
+                <div class="dropdown" style="padding-right:19px;">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <strong style="font-size:large">@Accessor.HttpContext.Session.GetString("UserName")</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                        <li><a class="dropdown-item" href="/Admin/Kullanici">Profil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/Logout">Çıkış Yap</a></li>
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
+
+    </header>
+    <div class="offcanvas offcanvas-start w-25 bg-dark opacity-75" style="max-width:250px;" tabindex="-1" id="offcanvas" data-bs-keyboard="false" data-bs-backdrop="false">
+        <button type="button" data-bs-dismiss="offcanvas" aria-label="Close">
+            <div class="offcanvas-header">
+                <h6 class="offcanvas-title d-none d-sm-block text-light" id="offcanvas">Menu</h6>
+                <i class="bi bi-x-circle" style="font-size: 2rem; color: red;"></i>
+            </div>
+        </button>
+        <div class="offcanvas-body px-0">
+            <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+                @{
+                    string dep = Accessor.HttpContext.Session.GetString("DepartmentName");
+
+                    <li class="nav-item">
+                        <a href="/Admin/Anasayfa" class="nav-link text-truncate">
+                            <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Anasayfa</span>
+                        </a>
+                    </li>
+                    if (((dep == "Yönetim") || (dep == "Admin")))
+                    {
+                        <li class="nav-item">
+                            <a href="/Admin/Sirketler" class="nav-link text-truncate">
+                                <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Şirketler</span>
+                            </a>
+                        </li>
+                    }
+                    if ((dep == "Admin"))
+                    {
+                        <li class="nav-item">
+                            <a href="/Admin/Roller" class="nav-link text-truncate">
+                                <i class="fs-5 bi-speedometer2"></i><span class="ms-1 d-none d-sm-inline">Roller</span>
+                            </a>
+                        </li>
+                    }
+                    if (((dep == "Satın Alma") || (dep == "Yönetim") || (dep == "Admin") || (dep == "Bilgi İşlem")))
+                    {
+                        <li>
+                            <a href="/Admin/Urunler" class="nav-link text-truncate">
+                                <i class="fs-5 bi-grid"></i><span class="ms-1 d-none d-sm-inline">Ürünler</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Admin/Kategoriler" class="nav-link text-truncate">
+                                <i class="fs-5 bi-grid"></i><span class="ms-1 d-none d-sm-inline">Kategoriler</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Admin/Markalar" class="nav-link text-truncate">
+                                <i class="fs-5 bi-grid"></i><span class="ms-1 d-none d-sm-inline">Markalar</span>
+                            </a>
+                        </li>
+                    }
+                    if ((dep == "İnsan Kaynakları" || dep == "Bilgi İşlem" || dep == "Admin" || dep == "Yönetim"))
+                    {
+                        <li>
+                            <a href="/Admin/Kullanicilar" class="nav-link text-truncate">
+                                <i class="fs-5 bi-people"></i><span class="ms-1 d-none d-sm-inline">Personeller</span>
+                            </a>
+                        </li>
+                    }
+
+                    <li>
+                        <a href="/Admin/Talepler" class="nav-link text-truncate">
+                            <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">İstekler</span>
+                        </a>
+                    </li>
+                    if (((dep == "Satın Alma") || (dep == "Yönetim") || (dep == "Admin")))
+                    {
+                        <li>
+                            <a href="/Admin/Stoklar" class="nav-link text-truncate">
+                                <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Stok</span>
+                            </a>
+                        </li>
+                    }
+                    if (((dep == "Muhasebe") || (dep == "Yönetim") || (dep == "Admin")))
+                    {
+                        <li>
+                            <a href="/Admin/Faturalar" class="nav-link text-truncate">
+                                <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Faturalar</span>
+                            </a>
+                        </li>
+                    }
+                    if (((dep == "Satın Alma") || (dep == "Yönetim") || (dep == "Admin")) || (dep == "Bilgi İşlem"))
+                    {
+                        <li>
+                            <a href="/Admin/Teklifler" class="nav-link text-truncate">
+                                <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Teklifler</span>
+                            </a>
+                        </li>
+                    }
+                    if (((dep == "Muhasebe") || (dep == "Yönetim") || (dep == "Admin")))
+                    {
+                        <li>
+                            <a href="/Admin/Raporlama" class="nav-link text-truncate">
+                                <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Raporlar</span>
+                            </a>
+                        </li>
+                    }
+                }
+                }
+                }
+            </ul>
+        </div>
+
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col min-vh-80 py-3">
+                <button onclick="topFunction()" id="myBtn" title="Go to top"><i class="bi bi-arrow-up fs-3 text-light"></i></button>
+                <div class="container">
+                    <br>
+                    <br />
+                    <br>
+                    <div class="container mb-2" id="SearchBtn" style="width: 80%;">
+                        <div class="input-group input-group-lg" style="border-style: solid;border-width: 1px; border-radius:5px;">
+                            <button type="button" class="btn text-light" style=" background-color:#248bd6;" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                @ViewData["buttonismi"]
+                            </button>
+                            <input autocomplete="off" type="text" class="form-control" style="" id="myInput" placeholder="Arama Yap...">
+
+                        </div>
+                    </div>
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+<style>
+    body {
+
+        background-size: cover;
+        background-repeat: no-repeat;
+        background:image("~/admin/img/bg.png");
+    }
+
+    tr:nth-child(even) {
+        background-color: #c6cdff !important;
+    }
+
+    tr:nth-child(odd) {
+        background-color: #83b8ff !important;
+    }
+</style>
+<script>
+    let mybutton = document.getElementById("myBtn");
+    window.onscroll = function () { scrollFunction() };
+    function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+        } else {
+            mybutton.style.display = "none";
+        }
+    }
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+    $('.modal').on('shown.bs.modal', function () {
+        $(this).find('[autofocus]').focus();
+    });
+    $(document).ready(function () {
+        $("#myInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            var found = false;
+
+            $("#example tr").filter(function () {
+                var text = $(this).text().toLowerCase();
+                var isVisible = text.indexOf(value) > -1;
+                $(this).toggle(isVisible);
+                if (isVisible) {
+                    found = true;
+                }
+            });
+
+            if (!found) {
+                // Eğer hiçbir veri bulunamadıysa "bulunamadı" mesajını göster
+                $("#notFoundMessage").show();
+                $("#notFoundMessage1").show();
+            } else {
+                // Eğer veri bulunduysa "bulunamadı" mesajını gizle
+                $("#notFoundMessage").hide();
+                $("#notFoundMessage1").hide();
+            }
+        });
+    });
+</script> 

@@ -1,0 +1,270 @@
+@using ERPProject.UI.Areas.Admin.Models
+@model UserInfoVM
+@{
+    ViewData["Title"] = "Anasayfa";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["baslik"] = "Anasayfa";
+}
+<script>
+    document.getElementById('SearchBtn').style.display = 'none';
+</script>
+<section class="container">
+    <div class="card text-center">
+        <div class="card-header">
+            <ul class="nav nav-pills card-header-pills">
+                <li class="nav-item">
+
+                    <a class="nav-link active" id="btnbilgiler" onclick="Bilgilerim()">Kişisel Bilgiler</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="btnistekler" onclick="Isteklerim()">İsteklerim</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="btnstok" onclick="Stok()">İşlemlerim</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="col-lg-12 mb-4 mb-sm-5" id="cardbodybilgiler">
+                <div class="card card-style1 border-0">
+                    <div class="card-body p-1-9 p-sm-2-3 p-md-6 p-lg-7">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6 mb-4 mb-lg-0">
+                                <img src="~/@Model.Image" style="max-height:300px; max-width:300px;" alt="...">
+                            </div>
+                            <div class="col-lg-6 px-xl-10">
+                                <div class="d-lg-inline-block py-1-9 px-1-9 px-sm-6 mb-1-9 rounded">
+                                    <h3 class="h2 text-dark mb-0">@Model.Name @Model.LastName</h3>
+                                    <span class="text-dark">
+                                        Pozisyon:
+                                        @for (int i = 0; i < 1; i++)
+                                        {
+                                            @Model.RoleName[i].ToString() <tab></tab>
+                                        }
+                                    </span>
+                                </div>
+                                <ul class="list-unstyled mb-1-9">
+                                    <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600">Şirket:</span>@Model.CompanyName</li>
+                                    <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600">Departman:</span> @Model.DepartmentName</li>
+                                    <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600">Email:</span> @Model.Email</li>
+                                    <li class="display-28"><span class="display-26 text-secondary me-2 font-weight-600">Phone:</span> 0 @Model.Phone</li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+               </div>
+        </div>
+    </div>
+    <div class="container-table100" style="border-radius:8px; display:none;" id="cardbodytalep">
+        <div class="wrap-table100">
+            <div class="table100 ver5 m-b-110">
+                <div class="table100-head">
+                    <table>
+                        <thead>
+                            <tr class="row100 head bg-secondary bg-opacity-75">
+                                <th class="cell100 column2 text-light">Talep Adı</th>
+                                <th class="cell100 column2 text-light">Ürün</th>
+                                <th class="cell100 column2 text-light">Açıklama</th>
+                                <th class="cell100 column2 text-light">Miktar</th>
+                                <th class="cell100 column2 text-light">Durum</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="table100-body">
+                    <table id="example">
+                        <tbody>
+                            @if (Model.Requests == null)
+                            {
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in Model.Requests)
+                                {
+
+                                    <tr class="row100 body">
+                                        <td class="cell100 column2">@item.Title</td>
+                                        <td class="cell100 column2">@item.ProductName</td>
+                                        <td class="cell100 column2">@item.Description</td>
+                                        @if (@item.QuantityUnit == 1)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity Metre
+                                            </td>
+                                        }
+                                        else if (@item.QuantityUnit == 2)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity Kilometre
+                                            </td>
+                                        }
+                                        else if (@item.QuantityUnit == 3)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity Mililitre
+                                            </td>
+                                        }
+                                        else if (@item.QuantityUnit == 4)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity Litre
+                                            </td>
+                                        }
+                                        else if (@item.QuantityUnit == 5)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity Kilogram
+                                            </td>
+                                        }
+                                        else if (@item.QuantityUnit == 6)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity Ton
+                                            </td>
+                                        }
+                                        else if (@item.QuantityUnit == 7)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity Adet
+                                            </td>
+                                        }
+                                        else if (@item.QuantityUnit == 8)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity Koli
+                                            </td>
+                                        }
+                                        else if (@item.QuantityUnit == 9)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity m²
+                                            </td>
+                                        }
+                                        else if (@item.QuantityUnit == 10)
+                                        {
+                                            <td class="cell100 column2">
+                                                @item.Quantity m³
+                                            </td>
+                                        }
+                                        @if (@item.RequestStatus == 0)
+                                        {
+                                            <td class="cell100 column2"> Beklemede... </td>
+                                        }
+                                        else if (@item.RequestStatus == 1)
+                                        {
+                                            <td class="cell100 column2"> Onaylandı... </td>
+                                        }
+                                        else if (@item.RequestStatus == 2)
+                                        {
+                                            <td class="cell100 column2"> Satın Alındı... </td>
+                                        }
+                                        else if (@item.RequestStatus == 3)
+                                        {
+                                            <td class="cell100 column2"> Reddedildi... </td>
+                                        }
+                                    </tr>
+
+
+
+                                }
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-table100" style="border-radius:8px; display:none;" id="cardbodystok">
+        <div class="wrap-table100">
+            <div class="table100 ver5 m-b-110">
+                <div class="table100-head">
+                    <table>
+                        <thead>
+                            <tr class="row100 head bg-opacity-75">
+                                <th class="cell100 column2 text-light">Ürün Adı</th>
+                                <th class="cell100 column2 text-light">Miktar</th>
+                                <th class="cell100 column2 text-light">Teslim Eden</th>
+                                <th class="cell100 column2 text-light">Tarih</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="table100-body">
+                    <table id="example">
+                        <div id="notFoundMessage" class="text-danger" style="display: none; padding-top:5px;">Sonuç bulunamadı...</div>
+                        <tbody>
+                            @foreach (var item in Model.StockDetail)
+                            {
+                                if (item.Quantity < 0)
+                                {
+                                    <tr class="row100 body">
+                                        <td class="cell100 column2">@item.ProductName</td>
+                                        <td class="cell100 column2">@Math.Abs(item.Quantity)</td>
+                                        <td class="cell100 column2">@item.DelivererName</td>
+                                        <td class="cell100 column2">@item.AddedTime</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<style>
+
+    p {
+        color: white !important;
+        font-size: 65px;
+        font-family: 'Times New Roman', Times, serif !important;
+    }
+
+    .video-wrap {
+        z-index: -100;
+    }
+
+    .custom-video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+
+</style>
+
+<script>
+    function Bilgilerim() {
+        document.getElementById('cardbodystok').style.display = 'none';
+        document.getElementById('cardbodytalep').style.display = 'none';
+        document.getElementById('cardbodybilgiler').style.display = 'block';
+        document.getElementById('btnbilgiler').classList.add("active");
+        document.getElementById('btnistekler').classList.remove("active");
+        document.getElementById('btnstok').classList.remove("active");
+    }
+    function Isteklerim() {
+        document.getElementById('cardbodystok').style.display = 'none';
+        document.getElementById('cardbodybilgiler').style.display = 'none';
+        document.getElementById('cardbodytalep').style.display = 'block';
+        document.getElementById('btnistekler').classList.add("active");
+        document.getElementById('btnbilgiler').classList.remove("active");
+        document.getElementById('btnstok').classList.remove("active");
+    }
+    function Stok() {
+        document.getElementById('cardbodytalep').style.display = 'none';
+        document.getElementById('cardbodybilgiler').style.display = 'none';
+        document.getElementById('cardbodystok').style.display = 'block';
+        document.getElementById('btnstok').classList.add("active");
+        document.getElementById('btnbilgiler').classList.remove("active");
+        document.getElementById('btnistekler').classList.remove("active");
+    }
+</script>

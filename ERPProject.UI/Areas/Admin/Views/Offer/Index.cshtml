@@ -1,0 +1,813 @@
+@using ERPProject.UI.Areas.Admin.Models
+@model OfferVM
+@inject IHttpContextAccessor Accessor
+
+@{
+    ViewData["Title"] = "Teklifler";
+    ViewData["baslik"] = "Teklifler";
+    ViewData["buttonismi"] = "Ara";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    string sirket = "false";
+    string departman = "false";
+    string admin = "false";
+
+    if (SessionRole.RoleName.Any(roles => roles.Contains("Şirket Müdürü")))
+    {
+        sirket = "true";
+    }
+    if (SessionRole.RoleName.Any(roles => roles.Contains("Departman Müdürü")))
+    {
+        departman = "true";
+    }
+    if (SessionRole.RoleName.Any(roles => roles.Contains("Admin")))
+    {
+        admin = "true";
+    }
+}
+
+<div class="container" style="min-height:500px !important;">
+    <div class="wrap-table100">
+        <div class="container col col-md-12 py-3">
+            <div class="accordion accordion-flush" id="accordionFlushExample">
+                <div id="example_filter" class="dataTables_filter">
+                    <div id="notFoundMessage1" class="text-danger" style="display: none;">Sonuç bulunamadı...</div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            Teklifler
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+
+                            <div class="wrap-table100">
+                                <div class="table100 ver5 m-b-110">
+                                    <div class="table100-head">
+                                        <table>
+                                            <thead>
+                                                <tr class="row100 head">
+                                                    <th class="cell100 column2 text-light opacity-75">Talep Adı</th>
+                                                    <th class="cell100 column2 text-light opacity-75">Ürün</th>
+                                                    <th class="cell100 column2 text-light opacity-75">Miktar</th>
+                                                    <th class="cell100 column2 text-light opacity-75">Açıklama</th>
+                                                    <th class="cell100 column5 text-light opacity-75">İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                    <div class="table100-body">
+                                        <table id="example">
+                                            <tbody>
+                                                @if (Model.Requests == null)
+                                                {
+                                                    <tr>
+                                                        <td></td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+
+                                                    @foreach (var item in Model.Requests)
+                                                    {
+                                                        if (item.RequestStatus == 1)
+                                                        {
+                                                            <tr>
+                                                                <td class="cell100 column2">@item.Title</td>
+                                                                <td class="cell100 column2">@item.ProductName</td>
+                                                                @if (@item.QuantityUnit == 1)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Metre
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 2)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Kilometre
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 3)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Mililitre
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 4)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Litre
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 5)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Kilogram
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 6)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Ton
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 7)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Adet
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 8)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Koli
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 9)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity m²
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 10)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity m³
+                                                                    </td>
+                                                                }
+                                                                <td class="cell100 column2">@item.Description</td>
+
+                                                                <td class="cell100 column5">
+                                                                    <div class="dropdown">
+                                                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            İşlemler
+                                                                        </button>
+                                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                                            <li>
+                                                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
+                                                                                   data-id1="@item.Id"
+                                                                                   data-title1="@item.Title"
+                                                                                   data-description1="@item.Description"
+                                                                                   data-username1="@item.UserName"
+                                                                                   data-product1="@item.ProductName"
+                                                                                   data-brim1="@item.QuantityUnit"
+                                                                                   data-miktar1="@item.Quantity"
+                                                                                   data-status1="@item.RequestStatus" onclick="Doldur()">Detay</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticTeklifEkle"
+                                                                                   data-id="@item.Id">Teklif Ekle</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                        <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div>
+
+                                        <div class="ps__rail-y" style="top: 0px; height: 585px; right: 0px;">
+                                            <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 295px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                            Eski Teklifler
+                        </button>
+                    </h2>
+                    <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <div class="wrap-table100">
+                                <div class="table100 ver5 m-b-110">
+                                    <div class="table100-head">
+                                        <table>
+                                            <thead>
+                                                <tr class="row100 head bg-opacity-75">
+                                                    <th class="cell100 column2 text-light opacity-75">Talep Adı</th>
+                                                    <th class="cell100 column2 text-light opacity-75">Ürün</th>
+                                                    <th class="cell100 column2 text-light opacity-75">Miktar</th>
+                                                    <th class="cell100 column2 text-light opacity-75">Açıklama</th>
+                                                    <th class="cell100 column5 text-light opacity-75">İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                    <div class="table100-body">
+                                        <table id="example">
+                                            <tbody>
+                                                @if (Model.Requests == null)
+                                                {
+                                                    <tr>
+                                                        <td></td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+
+                                                    @foreach (var item in Model.Requests)
+                                                    {
+                                                        if (item.RequestStatus == 2)
+                                                        {
+                                                            <tr>
+                                                                <td class="cell100 column2">@item.Title</td>
+                                                                <td class="cell100 column2">@item.ProductName</td>
+                                                                @if (@item.QuantityUnit == 1)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Metre
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 2)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Kilometre
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 3)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Mililitre
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 4)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Litre
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 5)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Kilogram
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 6)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Ton
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 7)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Adet
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 8)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity Koli
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 9)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity m²
+                                                                    </td>
+                                                                }
+                                                                else if (@item.QuantityUnit == 10)
+                                                                {
+                                                                    <td class="cell100 column2">
+                                                                        @item.Quantity m³
+                                                                    </td>
+                                                                }
+                                                                <td class="cell100 column2">@item.Description</td>
+
+                                                                <td class="cell100 column5">
+                                                                    <div class="dropdown">
+                                                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            İşlemler
+                                                                        </button>
+                                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                                            <li>
+                                                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdropEskiTalep"
+                                                                                   data-id1="@item.Id"
+                                                                                   data-title1="@item.Title"
+                                                                                   data-description1="@item.Description"
+                                                                                   data-username1="@item.UserName"
+                                                                                   data-product1="@item.ProductName"
+                                                                                   data-brim1="@item.QuantityUnit"
+                                                                                   data-miktar1="@item.Quantity"
+                                                                                   data-status1="@item.RequestStatus" onclick="Doldur1()">Detaylar</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                        <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div>
+
+                                        <div class="ps__rail-y" style="top: 0px; height: 585px; right: 0px;">
+                                            <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 295px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static2" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Talep Detay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body col gap-4 d-flex justify-content-start" style="overflow-x:hidden !important;">
+                <div class="">
+                    <input autocomplete="off" hidden="hidden" class="form-control" id="inputRequestIdDetay" name="RequestId" aria-describedby="basic-addon1" required>
+                    <input autocomplete="off" type="hidden" class="form-control" placeholder="İstek..." id="inputId2" name="Id" aria-describedby="basic-addon1" required>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <input readonly="readonly" class="form-control" id="inputUserId2" name="UserId" aria-describedby="basic-addon1" required>
+
+
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input readonly="readonly" autocomplete="off" type="text" class="form-control" placeholder="İstek..." id="inputTalepAd2" name="Title" aria-describedby="basic-addon1" required>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input readonly="readonly" class="form-control" id="inputProduct2" name="ProductId" aria-describedby="basic-addon1" required>
+
+
+                        <select readonly="readonly" class="form-control" id="inputBirim5" name="QuantityUnit" aria-describedby="basic-addon1" required>
+                            <option value="">Birim Seçiniz...</option>
+                            <option value="1">Metre</option>
+                            <option value="2">Kilometre</option>
+                            <option value="3">Mililitre</option>
+                            <option value="4">Litre</option>
+                            <option value="5">Kilogram</option>
+                            <option value="6">Ton</option>
+                            <option value="7">Adet</option>
+                            <option value="8">Koli</option>
+                            <option value="9">m²</option>
+                            <option value="10">m³</option>
+                        </select>
+
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input readonly="readonly" autocomplete="off" type="text" class="form-control" placeholder="Miktar..." id="inputMiktar2" name="Quantity" aria-describedby="basic-addon1" required>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-info-circle"></i></span>
+<textarea readonly="readonly" autocomplete="off" style="min-height:150px; max-height:150px;" type="text" class="form-control" placeholder="İstek Açıklaması..." id="inputAciklama2" name="Description" aria-describedby="basic-addon1" required></textarea>
+                    </div>
+                </div>
+                <div class="col" id="doldur">
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdropEskiTalep" data-bs-backdrop="static2" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Eski Talep Detay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body col gap-4 d-flex justify-content-start" style="overflow-x:hidden !important;">
+                <div class="">
+                    <input autocomplete="off" hidden="hidden" class="form-control" id="inputRequestIdDetay1" name="RequestId" aria-describedby="basic-addon1" required>
+                    <input autocomplete="off" type="hidden" class="form-control" placeholder="İstek..." id="inputId21" name="Id" aria-describedby="basic-addon1" required>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <input readonly="readonly" class="form-control" id="inputUserId21" name="UserId" aria-describedby="basic-addon1" required>
+
+
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input readonly="readonly" autocomplete="off" type="text" class="form-control" placeholder="İstek..." id="inputTalepAd21" name="Title" aria-describedby="basic-addon1" required>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input readonly="readonly" class="form-control" id="inputProduct21" name="ProductId" aria-describedby="basic-addon1" required>
+
+
+                        <select readonly="readonly" class="form-control" id="inputBirim51" name="QuantityUnit" aria-describedby="basic-addon1" required>
+                            <option value="">Birim Seçiniz...</option>
+                            <option value="1">Metre</option>
+                            <option value="2">Kilometre</option>
+                            <option value="3">Mililitre</option>
+                            <option value="4">Litre</option>
+                            <option value="5">Kilogram</option>
+                            <option value="6">Ton</option>
+                            <option value="7">Adet</option>
+                            <option value="8">Koli</option>
+                            <option value="9">m²</option>
+                            <option value="10">m³</option>
+                        </select>
+
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input readonly="readonly" autocomplete="off" type="text" class="form-control" placeholder="Miktar..." id="inputMiktar21" name="Quantity" aria-describedby="basic-addon1" required>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-info-circle"></i></span>
+<textarea readonly="readonly" autocomplete="off" style="min-height:150px; max-height:150px;" type="text" class="form-control" placeholder="İstek Açıklaması..." id="inputAciklama21" name="Description" aria-describedby="basic-addon1" required></textarea>
+                    </div>
+                </div>
+                <div class="col" id="doldur1">
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticTeklifEkle" data-bs-backdrop="static2" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Teklif Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/TeklifEkle" method="post">
+
+                <div class="modal-body">
+                    <input autocomplete="off" hidden="hidden" class="form-control" placeholder="İstek..." id="inputRequestId" name="RequestId" aria-describedby="basic-addon1" required>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-person"></i></span>
+                        <input placeholder="Satıcı Firma" class="form-control" id="inputSupplierName" name="SupplierName" aria-describedby="basic-addon1" required autofocus>
+                    </div>
+
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input placeholder="Tutar..." class="form-control" id="inputProduct2" name="Price" aria-describedby="basic-addon1" required>
+
+
+                        <select class="form-control" id="inputOfferPriceStatus" name="PriceStatus" aria-describedby="basic-addon1" required>
+                            <option value="">Para Birimi Seçiniz...</option>
+                            <option value="0">₺</option>
+                            <option value="1">£</option>
+                            <option value="2">$</option>
+                            <option value="3">¥</option>
+
+                        </select>
+
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-info-circle"></i></span>
+<textarea autocomplete="off" style="min-height:150px; max-height:150px;" type="text" class="form-control" placeholder="Teklif Açıklaması..." id="inputOfferDescription" name="Description" aria-describedby="basic-addon1" required></textarea>
+                    </div>
+
+                    <div hidden="true" class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-cart"></i></span>
+                        <input class="form-control" value="1" id="inputOfferStatus" name="Status" aria-describedby="basic-addon1" required>
+                        <input class="form-control" id="inputOfferStatus" name="UserId" aria-describedby="basic-addon1" value="@Accessor.HttpContext.Session.GetString("User")">
+
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Ekle</button>
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    var token = $("#token").val();
+    function confirmRolDelete(id) {
+        var result = confirm("Bu talebi silmek istediğinizden emin misiniz?");
+        if (result) {
+            window.location.href = 'TalepSil/' + id;
+        }
+    }
+    $('.js-pscroll').each(function () {
+        var ps = new PerfectScrollbar(this);
+        $(window).on('resize', function () {
+            ps.update();
+        })
+    });
+    $('.js-pscroll1').each(function () {
+        var ps = new PerfectScrollbar(this);
+        $(window).on('resize', function () {
+            ps.update();
+        })
+    });
+    $('.js-pscroll2').each(function () {
+        var ps = new PerfectScrollbar(this);
+        $(window).on('resize', function () {
+            ps.update();
+        })
+    });
+    function Doldur1() {
+
+        var selectedCompanyId = $("#inputRequestIdDetay1").val();
+        $.ajax({
+            url: "https://localhost:7075/GetOfferByjs/" + selectedCompanyId,
+            type: "GET",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            },
+            success: function (data) {
+                $("#doldur1").empty();
+                var html = `
+            <div class="table100 ver5 m-b-110" style="align-content:start;">
+            <div class="table100-head">
+            <table>
+            <thead>
+            <tr class="row100 head">
+            <th class="cell100 column2 text-light opacity-75">Firma</th>
+            <th class="cell100 column2 text-light opacity-75">Teklif</th>
+            <th class="cell100 column2 text-light opacity-75">Açıklama</th>
+            <th class="cell100 column2 text-light opacity-75">Durum</th>
+            </tr>
+            </thead>
+            </table>
+            </div>
+            <div class="table100-body">
+            <table id="example">
+            <div id="notFoundMessage" class="text-danger" style="display: none; padding-top:5px;">Sonuç bulunamadı...</div>
+            `;
+
+                var arr = data;
+                for (var i = 0; i < arr.length; i++) {
+
+                    html += `<tbody><tr>`;
+                    html += `<td class="cell100 column2">${arr[i].supplierName}</td>`;
+                    if (arr[i].priceStatus == "0 ") {
+                        html += `<td class="cell100 column2">${arr[i].price} ₺</td>`;
+                    }
+                    else if (arr[i].priceStatus == "1 ") {
+                        html += `<td class="cell100 column2">${arr[i].price} $</td>`;
+                    }
+                    else if (arr[i].priceStatus == "2 ") {
+                        html += `<td class="cell100 column2">${arr[i].price} £</td>`;
+                    }
+                    else if (arr[i].priceStatus == "3 ") {
+                        html += `<td class="cell100 column2">${arr[i].price} ¥</td>`;
+                    }
+                    html += `<td class="cell100 column1">${arr[i].description}</td>`;
+                    if (arr[i].status == 1) {
+                        html += `<td class="cell100 column2">Onay Bekliyor...</td>`;
+                    }
+                    else if (arr[i].status == 2) {
+                        html += `<td class="cell100 column2">Kabul Edildi...</td>`;
+                    }
+                    else if (arr[i].status == 3) {
+                        html += `<td class="cell100 column2">Reddedildi...</td>`;
+                    }
+                    else if (arr[i].status == 4) {
+                        html += `<td class="cell100 column2">Onaylandı...</td>`;
+                    }
+                    html += `</tbody>`;
+                }
+                html += `</tr></table>`;
+                $("#doldur1").html(html);
+            },
+            error: function (xhr, status, error) {
+                alert("Ajax error:", error + status);
+            }
+
+        });
+    }
+    function Doldur() {
+
+        var selectedCompanyId = $("#inputRequestIdDetay").val();
+        $.ajax({
+            url: "https://localhost:7075/GetOfferByjs/" + selectedCompanyId,
+            type: "GET",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            },
+            success: function (data) {
+                $("#doldur").empty();
+                var html = `
+            <div class="table100 ver5 m-b-110" style="align-content:start;">
+            <div class="table100-head">
+            <table>
+            <thead>
+            <tr class="row100 head">
+            <th class="cell100 column2 text-light opacity-75">Firma</th>
+            <th class="cell100 column2 text-light opacity-75">Teklif</th>
+            <th class="cell100 column2 text-light opacity-75">Açıklama</th>
+            <th class="cell100 column2 text-light opacity-75">Durum</th>
+            <th class="cell100 column5 text-light opacity-75">İşlemler</th>
+            </tr>
+            </thead>
+            </table>
+            </div>
+            <div class="table100-body">
+            <table id="example">
+            <div id="notFoundMessage" class="text-danger" style="display: none; padding-top:5px;">Sonuç bulunamadı...</div>
+            `;
+
+                var arr = data;
+                for (var i = 0; i < arr.length; i++) {
+
+                    html += `<tbody><tr>`;
+                    html += `<td class="cell100 column2">${arr[i].supplierName}</td>`;
+                    if (arr[i].priceStatus == "0 ") {
+                        html += `<td class="cell100 column2">${arr[i].price} ₺</td>`;
+                    }
+                    else if (arr[i].priceStatus == "1 ") {
+                        html += `<td class="cell100 column2">${arr[i].price} $</td>`;
+                    }
+                    else if (arr[i].priceStatus == "2 ") {
+                        html += `<td class="cell100 column2">${arr[i].price} £</td>`;
+                    }
+                    else if (arr[i].priceStatus == "3 ") {
+                        html += `<td class="cell100 column2">${arr[i].price} ¥</td>`;
+                    }
+                    html += `<td class="cell100 column2">${arr[i].description}</td>`;
+                    if (arr[i].status == 1) {
+                        html += `<td class="cell100 column2">Onay Bekliyor...</td>`;
+                    }
+                    else if (arr[i].status == 2) {
+                        html += `<td class="cell100 column2">Kabul Edildi...</td>`;
+                    }
+                    else if (arr[i].status == 3) {
+                        html += `<td class="cell100 column2">Reddedildi...</td>`;
+                    }
+                    else if (arr[i].status == 4) {
+                        html += `<td class="cell100 column2">Onaylandı...</td>`;
+                    }
+                    html += ` <td class="cell100 column5">
+            <div>
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            İşlemler
+            </button>
+
+
+            <ul class="dropdown-menu">
+            <li>
+            <form method="post" action="/Admin/TeklifGuncelle">
+            <input hidden="hidden" value="${arr[i].id}" name="Id">
+            <input hidden="hidden" value="${arr[i].price}" name="Price">
+            <input hidden="hidden" value="${arr[i].priceStatus}" name="PriceStatus">
+            <input hidden="hidden" value="${arr[i].description}" name="Description">
+            <input hidden="hidden" value="${arr[i].supplierName}" name="SupplierName">
+            <input hidden="hidden" value="${arr[i].addedUser}" name="AddedUser">
+            <input hidden="hidden" value="${arr[i].requestId}" name="RequestId">
+            <input hidden="hidden" value="2" name="Status">
+            <input hidden="hidden" value="@Accessor.HttpContext.Session.GetString("User")" name="UserId">
+            <button class="dropdown-item" type="submit">Kabul Et</button>
+            </form>
+            </li>
+            <li>
+            <form method="post" action="/Admin/TeklifGuncelle">
+            <input hidden="hidden" value="${arr[i].id}" name="Id">
+            <input hidden="hidden" value="${arr[i].price}" name="Price">
+            <input hidden="hidden" value="${arr[i].priceStatus}" name="PriceStatus">
+            <input hidden="hidden" value="${arr[i].description}" name="Description">
+            <input hidden="hidden" value="${arr[i].supplierName}" name="SupplierName">
+            <input hidden="hidden" value="${arr[i].addedUser}" name="AddedUser">
+            <input hidden="hidden" value="${arr[i].requestId}" name="RequestId">
+            <input hidden="hidden" value="3" name="Status">
+            <input hidden="hidden" value="@Accessor.HttpContext.Session.GetString("User")" name="UserId">
+            <button class="dropdown-item" type="submit">Reddet</button>
+            </form>
+            </li>
+
+            `;
+
+
+                    
+
+                    if (arr[i].price >= 500000 && (@sirket == true || @admin== true)) {
+
+
+                        html +=
+                            `
+                <li>
+                <form method="post" action="/Admin/TeklifTopluGuncelle">
+                <input hidden="hidden" value="${arr[i].id}" name="Id">
+                <input hidden="hidden" value="${arr[i].price}" name="Price">
+                <input hidden="hidden" value="${arr[i].priceStatus}" name="PriceStatus">
+                <input hidden="hidden" value="${arr[i].description}" name="Description">
+                <input hidden="hidden" value="${arr[i].supplierName}" name="SupplierName">
+                <input hidden="hidden" value="${arr[i].addedUser}" name="AddedUser">
+                <input hidden="hidden" value="${arr[i].requestId}" name="RequestId">
+                <input hidden="hidden" value="4" name="Status">
+                <input hidden="hidden" value="@Accessor.HttpContext.Session.GetString("User")" name="UserId">
+                <button class="dropdown-item" type="submit">Onayla</button>
+                </form>
+                </li>`;
+                    }
+                    if (arr[i].price <= 500000 && (@departman == true || @admin==true) ) {
+
+
+                        html +=
+                            `
+                <li>
+                <form method="post" action="/Admin/TeklifTopluGuncelle">
+                <input hidden="hidden" value="${arr[i].id}" name="Id">
+                <input hidden="hidden" value="${arr[i].price}" name="Price">
+                <input hidden="hidden" value="${arr[i].priceStatus}" name="PriceStatus">
+                <input hidden="hidden" value="${arr[i].description}" name="Description">
+                <input hidden="hidden" value="${arr[i].supplierName}" name="SupplierName">
+                <input hidden="hidden" value="${arr[i].addedUser}" name="AddedUser">
+                <input hidden="hidden" value="${arr[i].requestId}" name="RequestId">
+                <input hidden="hidden" value="4" name="Status">
+                <input hidden="hidden" value="@Accessor.HttpContext.Session.GetString("User")" name="UserId">
+                <button class="dropdown-item" type="submit">Onayla</button>
+                </form>
+                </li>`;
+                    }
+                    html += `
+            </ul>
+
+
+            </div>
+            </td>`;
+                    html += `</tbody>`;
+                }
+                html += `</tr></table>`;
+                $("#doldur").html(html);
+            },
+            error: function (xhr, status, error) {
+                alert("Ajax error:", error + status);
+            }
+
+        });
+    }
+
+
+    $('#staticBackdrop2').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var id = button.data('id1');
+        var title = button.data('title1');
+        var description = button.data('description1');
+        var username = button.data('username1');
+        var product = button.data('product1');
+        var brim = button.data('brim1');
+        var miktar = button.data('miktar1');
+        var status = button.data('status1');
+        $("#inputRequestIdDetay").val(id);
+        $("#inputId2").val(id);
+        $("#inputTalepAd2").val(title);
+        $("#inputAciklama2").val(description);
+        $("#inputUserId2").val(username);
+        $("#inputProduct2").val(product);
+        $("#inputBirim5").val(brim);
+        $("#inputMiktar2").val(miktar);
+        $("#inputStatus2").val(status);
+    });
+    $('#staticBackdropEskiTalep').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var id = button.data('id1');
+        var title = button.data('title1');
+        var description = button.data('description1');
+        var username = button.data('username1');
+        var product = button.data('product1');
+        var brim = button.data('brim1');
+        var miktar = button.data('miktar1');
+        var status = button.data('status1');
+        $("#inputRequestIdDetay1").val(id);
+        $("#inputId21").val(id);
+        $("#inputTalepAd21").val(title);
+        $("#inputAciklama21").val(description);
+        $("#inputUserId21").val(username);
+        $("#inputProduct21").val(product);
+        $("#inputBirim51").val(brim);
+        $("#inputMiktar21").val(miktar);
+        $("#inputStatus21").val(status);
+    });
+    $('#staticTeklifEkle').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var id = button.data('id');
+        $("#inputRequestId").val(id);
+    });
+</script>

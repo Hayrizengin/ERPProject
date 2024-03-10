@@ -1,0 +1,283 @@
+@using ERPProject.UI.Areas.Admin.Models;
+@model CompanyVM
+@inject IHttpContextAccessor Accessor
+@{
+    ViewData["Title"] = "Şirketler";
+    ViewData["baslik"] = "Şirketler";
+    ViewData["buttonismi"] = "Şirket Ekle";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+    @{
+        if (Accessor.HttpContext.Session.GetString("DepartmentName") == "Yönetim")
+        {
+        <script>
+            document.getElementById('SearchBtn').style.display = 'none';
+        </script>
+        }
+    }
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @{
+        int i = 0;
+    }
+    @foreach (var item in Model.Companies)
+    {
+        <div>
+            <div class="card">
+                <div class="card-front" style="min-height:379px;">
+                    <div class="col " style="position: absolute;top: 0;left: 0;">
+                        <div class="btn-group">
+                            <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                ...
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop3" data-id="@item.Id" data-name-id="@item.Name"                  data-resim="@item.Image">Düzenle</a></li>
+                                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop1" data-id="@item.Id">Departman Ekle</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" onclick="confirmDelete(@item.Id)">Sil</a></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <img src="~/@item.Image" class="card-img-top" alt="ahlatcilogo" style="height:350px!important;">
+                        <h5 class="card-title">@item.Name</h5>
+                    </div>
+                </div>
+                <div class="card-back" style="max-height: 395px; overflow-y: auto;">
+                    <table class="table table-hover rounded" id="example" style="min-width:406px; min-height:379px;">
+                        <thead>
+                            <tr class="text-light">
+                                <th scope="col"><strong>Departmanlar</strong></th>
+                                <th scope="col"><strong>İşlemler</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var dd in Model.Departments)
+                            {
+                                if (dd.CompanyId == item.Id)
+                                {
+                                    <tr>
+                                        <td>@dd.Name</td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    İşlemler
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" data-id="@dd.Id" data-another-id="@dd.CompanyId" data-name-id="@dd.Name">Düzenle</a></li>
+                                                    <li><hr class="dropdown-divider text-danger"></li>
+                                                    <li><a class="dropdown-item text-danger" onclick="confirmDepartmentDelete(@dd.Id)">Sil</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <button class="flip-button col col-md-6" style="width:100%; background-color:#c6cdff" onclick="flipCard(@i)">Departmanlar</button>
+        </div>
+        i++;
+    }
+</div>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Şirket Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/SirketEkle" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Şirket İsmi</span>
+                        <input autocomplete="off" type="text" class="form-control" placeholder="Şirket İsmi..." id="inputSirketAd" name="Name" aria-describedby="basic-addon1" required autofocus>
+
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Şirket Resmi</span>
+                        <input type="file" name="compImage" />
+                        <input hidden="hidden" type="text" name="Image" id="inputImage" />
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static1" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Departman Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/Admin/DepartmanEkle" method="post">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <input type="hidden" class="form-control" id="inputSirketId" name="CompanyId" value="" aria-describedby="basic-addon1">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Departman İsmi</span>
+                        <input autocomplete="off" type="text" class="form-control" placeholder="Departman İsmi..." id="inputDepartmanAd" name="Name" aria-describedby="basic-addon1" required autofocus>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static2" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Departman düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="hidden" class="form-control" id="inputDepartmanId" name="Id" value="" aria-describedby="basic-addon1">
+                    <input type="hidden" class="form-control" id="inputCompId" name="CompanyId" value="" aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1">Departman İsmi</span>
+                    <input autocomplete="off" type="text" class="form-control" placeholder="Departman İsmi..." id="inputDepartmanName" name="Name" aria-describedby="basic-addon1" autofocus>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                <button type="submit" class="btn btn-primary" onclick="RolKaydet()">Kaydet</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static3" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Şirket düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="SirketGuncelle" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <input type="hidden" class="form-control" id="inputCompanyId" name="Id" value="" aria-describedby="basic-addon1">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Şirket İsmi</span>
+                        <input autocomplete="off" type="text" class="form-control" placeholder="Şirket İsmi..." id="inputCompanyName" name="Name" aria-describedby="basic-addon1" autofocus>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Şirket Resmi</span>
+                        <input type="file" name="imageFile" value="" />
+                        <input type="text" hidden="hidden" name="Image" id="inputImage1"/>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function confirmDelete(id) {
+        var result = confirm("Bu şirketi silmek istediğinizden emin misiniz?");
+        if (result) {
+            window.location.href = '/Admin/SirketSil/' + id;
+        }
+    }
+    function confirmDepartmentDelete(id) {
+        var result = confirm("Bu departmanı silmek istediğinizden emin misiniz?");
+        if (result) {
+            window.location.href = '/Admin/DepartmanSil/' + id;
+        }
+    }
+    $('#staticBackdrop1').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var CompanyId = button.data('id');
+        $("#inputSirketId").val(CompanyId);
+    });
+    $('#staticBackdrop3').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var CompanyId = button.data('id');
+        var compName = button.data('nameId');
+        var compResim = button.data('resim');
+        $("#inputCompanyId").val(CompanyId);
+        $("#inputCompanyName").val(compName);
+        $("#inputImage1").val(compResim);
+    });
+    $('#staticBackdrop2').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var CompanyId = button.data('id');
+        var depId = button.data('anotherId');
+        var depName = button.data('nameId');
+        $("#inputDepartmanId").val(CompanyId);
+        $("#inputCompId").val(depId);
+        $("#inputDepartmanName").val(depName);
+    });
+    function RolKaydet() {
+        var rol = {
+            Id: $("#inputDepartmanId").val(),
+            Name: $("#inputDepartmanName").val(),
+            CompanyId: $("#inputCompId").val()
+        };
+        $.ajax({
+            url: '/Admin/DepartmanGuncelle',
+            type: 'post',
+            data: rol,
+            success: function (response) {
+                if (response == true) {
+                    success(response);
+                }
+                else {
+                    location.reload();
+                }
+            },
+            error: function () {
+                alert("hata");
+            }
+        });
+    }
+    // function SirketDuzenle() {
+    //     var rol = {
+    //         Id: $("#inputCompanyId").val(),
+    //         Name: $("#inputCompanyName").val(),
+    //         Image: $("#imageFile").val()
+    //     };
+    //     $.ajax({
+    //         url: '/Admin/SirketGuncelle',
+    //         type: 'post',
+    //         data: rol,
+    //         success: function (response) {
+    //             if (response == true) {
+    //                 success(response);
+    //             }
+    //             else {
+    //                 location.reload();
+    //             }
+    //         },
+    //         error: function () {
+    //             alert("hata");
+    //         }
+    //     });
+    // }
+</script>

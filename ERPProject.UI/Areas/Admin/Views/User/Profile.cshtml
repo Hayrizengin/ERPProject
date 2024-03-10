@@ -1,0 +1,83 @@
+﻿@using ERPProject.Entity.DTO.UserDTO
+@model UserDTOResponse
+@inject IHttpContextAccessor Accessor
+@{
+    ViewData["Title"] = "Profile";
+
+    ViewData["baslik"] = "Profil";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    
+}
+<script>
+    document.getElementById('SearchBtn').style.display = 'none';
+</script>
+<section class="bg-light" style="border-radius:15px;">
+    <br />
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 mb-4 mb-sm-5">
+                <div class="card card-style1 border-0">
+                    <div class="card-body p-1-9 p-sm-2-3 p-md-6 p-lg-7">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6 mb-4 mb-lg-0">
+                                <img src="~/@Model.Image" style="max-height:300px; max-width:300px;" alt="...">
+                            </div>
+                            <div class="col-lg-6 px-xl-10">
+                                <div class="d-lg-inline-block py-1-9 px-1-9 px-sm-6 mb-1-9 rounded">
+                                    <h3 class="h2 text-dark mb-0">@Model.Name @Model.LastName</h3>
+                                    <span class="text-dark">Pozisyon:
+                                        @for (int i = 0; i < 1; i++)
+                                        {
+                                            @Model.RoleName[i].ToString() <tab></tab>
+                                        }
+
+
+                                    </span>
+                                </div>
+                                <ul class="list-unstyled mb-1-9">
+                                    <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600">Şirket:</span>@Model.CompanyName</li>
+                                    <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600">Departman:</span> @Model.DepartmentName</li>
+                                    <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600">Email:</span> @Model.Email</li>
+                                    <li class="display-28"><span class="display-26 text-secondary me-2 font-weight-600">Phone:</span> 0 @Model.Phone</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</section>
+<button type="button" class="btn text-light" style=" background-color:#248bd6;" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Şifre Güncelle</button>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Şifre Güncelle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form enctype="multipart/form-data" class= action="/Admin/KullaniciGuncelle" method="post">
+                <div class="modal-body">
+                        <input autocomplete="off" hidden="hidden" value="@Model.Name" id="inputAds" name="Name" required >
+                        <input autocomplete="off" hidden="hidden" value="@Model.Id" id="inputAds" name="Id" required >
+                        <input autocomplete="off" hidden="hidden" value="@Model.LastName" id="inputAds" name="LastName" required >
+                        <input autocomplete="off" hidden="hidden" value="@Model.Email" id="inputAds" name="Email" required >
+                        <input autocomplete="off" hidden="hidden" value="@Model.DepartmentId" id="inputAds" name="DepartmentId" required >
+                        <input autocomplete="off" hidden="hidden" value="@Model.Image" id="inputAds" name="Image" required >
+                        <input autocomplete="off" hidden="hidden" value="@Model.Phone" id="inputAds" name="Phone" required >
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1"><i class="bi bi-incognito"></i></span>
+                            <input autocomplete="off" type="text" class="form-control" placeholder="Sifre..."  id="inputPassword" name="Password" aria-describedby="basic-addon1" required autofocus>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
